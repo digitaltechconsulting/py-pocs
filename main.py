@@ -3,6 +3,8 @@ from logger.log import *
 import RPi.GPIO as GPIO
 import threading
 import time
+import os
+import camera.cam as cam
 
 MOTION_SENSOR_PIN = 11
 
@@ -11,6 +13,8 @@ class Main:
         self.logger = Logger()
         self.motionDetected = False
         self.MotionDetectorThread = None
+        self.cam = cam.Cam(path="./snaps")
+        self.capturedFiles = []
     def Entry(self):
         self.logger.LogInfo("Inside Entry....")
         #c = Cam(5,5,path="./snaps")
@@ -31,11 +35,20 @@ class Main:
                 if self.motionDetected == False:
                     #start taking pics
                     self.motionDetected = True
-                    self.logger.LogInfo("Motion has detected and taking snaps");                
+                    self.logger.LogInfo("Motion has detected and taking snaps");
+                else:
+                    fileName = self.cam.captureSingle();
+                    self.capturedFiles.append(fileName)
+                    time.sleep(1)
             else:
                 if self.motionDetected == True:
                     self.logger.LogInfo("Cleaning up stuff.");
                     self.motionDetected = False
+                    self.logger.LogInfo(self.capturedFiles)
+                    for f in self.capturedFiles:
+                        os.remove(f)
+                        print("deleting {f}".format(f=f))
+                    self.capturedFiles.clear()
                 
         
         

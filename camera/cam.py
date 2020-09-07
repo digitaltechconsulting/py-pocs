@@ -14,6 +14,11 @@ class Cam:
         self.ids = []
         self.camera = picamera.PiCamera();
         self.logger = Logger();
+    def getUniqueFileName(self):
+        uid = uuid.uuid4().hex
+        fileName = '{path}/{uid}.jpg'.format(path=self.path,uid=uid)
+        return fileName
+        
     def capture(self):
         self.logger.LogInfo("Capturing photos");
         for i in range(self.length):
@@ -25,9 +30,18 @@ class Cam:
         return self.ids
     def captureThread(self):
         th = threading.Thread(target=self.capture,args=())
-        self.logger.LogInfo("Starting thread capture");
+        self.logger.LogInfo("Starting thread capture")
         th.start();
-        self.logger.LogInfo("Started thread capture");
+        self.logger.LogInfo("Started thread capture")
+        
+    def captureSingle(self):
+        self.logger.LogInfo("Capturing single photo");
+        fileName = self.getUniqueFileName()
+        self.camera.capture(fileName)
+        self.logger.LogInfo("Captured {fileName}".format(fileName=fileName));
+        return fileName;
+        
+    
         
         
         
