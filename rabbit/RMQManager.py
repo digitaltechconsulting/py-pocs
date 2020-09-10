@@ -18,10 +18,6 @@ class RMQManager:
     def SendMessage(self):
         channel = self.connection.channel();
         channel.basic_publish()
-        
-        
-
-
 
 if __name__ == "__main__":
     print("I am in inside RMQManager")
