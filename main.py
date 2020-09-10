@@ -3,50 +3,60 @@ from logger.log import *
 import RPi.GPIO as GPIO
 import threading
 import time
+import datetime
 import os
 import camera.cam as cam
 
 MOTION_SENSOR_PIN = 11
+imageStore = "./snaps"
 
 class Main:
     def __init__(self):
         self.logger = Logger()
         self.motionDetected = False
+        self.motionDetectedTime = None
         self.MotionDetectorThread = None
-        self.cam = cam.Cam(path="./snaps")
+        self.cam = cam.Cam(path=imageStore)
         self.capturedFiles = []
     def Entry(self):
-        self.logger.LogInfo("Inside Entry....")
+        self.logger.LogInfo("Inside Entry....")        
         #c = Cam(5,5,path="./snaps")
         #ids = c.capture()
         #print(ids)
         self.StartMotionDetector()
     def StartMotionDetector(self):
-        self.logger.LogInfo("Setting up GPIO pins");
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(MOTION_SENSOR_PIN, GPIO.IN)
+        self.SetupGpioPins()
         self.MotionDetectorThread = threading.Thread(target=self.StartMotionDetectorThread,args=())
         self.logger.LogInfo("Starting StartMotionDetectorThread");
         self.MotionDetectorThread.start()
+    def SetupGpioPins(self):
+        self.logger.LogInfo("Setting up GPIO pins");
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(MOTION_SENSOR_PIN, GPIO.IN)
+        
     def StartMotionDetectorThread(self):
         self.logger.LogInfo("Started StartMotionDetectorThread");
         while True:
             if GPIO.input(MOTION_SENSOR_PIN) == GPIO.HIGH:
                 if self.motionDetected == False:
                     #start taking pics
+                    self.motionDetectedTime = datetime.datetime.now()
                     self.motionDetected = True
                     self.logger.LogInfo("Motion has detected and taking snaps");
                 else:
-                    fileName = self.cam.captureSingle();
+                    newImageStore = "{imageStore}/{motionDetectedTime}".format(imageStore=imageStore,motionDetectedTime=self.motionDetectedTime)
+                    if os.path.exists(newImageStore) == False:
+                        os.makedirs(newImageStore)
+                    fileName = self.cam.captureSingle(path=newImageStore)
                     self.capturedFiles.append(fileName)
-                    time.sleep(1)
+                    time.sleep(0.2)
             else:
                 if self.motionDetected == True:
-                    self.logger.LogInfo("Cleaning up stuff.");
+                    self.logger.LogInfo("Cleaning up stuff.")
                     self.motionDetected = False
                     self.logger.LogInfo(self.capturedFiles)
                     for f in self.capturedFiles:
-                        os.remove(f)
+                        #os.remove(f)
                         print("deleting {f}".format(f=f))
                     self.capturedFiles.clear()
                 

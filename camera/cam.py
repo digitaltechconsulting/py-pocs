@@ -13,6 +13,7 @@ class Cam:
         self.path = path
         self.ids = []
         self.camera = picamera.PiCamera();
+        self.camera.resolution = (1024,768)
         self.logger = Logger();
     def getUniqueFileName(self):
         uid = uuid.uuid4().hex
@@ -34,18 +35,19 @@ class Cam:
         th.start();
         self.logger.LogInfo("Started thread capture")
         
-    def captureSingle(self):
+    def captureSingle(self,path=""):
         self.logger.LogInfo("Capturing single photo");
+        if path == "":
+            self.logger.LogInfo("Path not provided using default -> {path}".format(path=self.path))
+        else:
+            self.path = path
+            self.logger.LogInfo("Path not provided using default -> {path}".format(path=path))
+            
         fileName = self.getUniqueFileName()
         self.camera.capture(fileName)
         self.logger.LogInfo("Captured {fileName}".format(fileName=fileName));
         return fileName;
-        
     
-        
-        
-        
-
 if __name__ == "__main__":
     c = Cam(path="../snaps");
     c.captureThread();
