@@ -9,7 +9,7 @@ class Logger:
 
 
 if __name__ == "__main__":
-    logger = Logger();
+    logger = Logger()
     logger.LogInfo("This is test info message")
     logger.LogWarning("This is test warning message")
     logger.LogError("This is test error message")
