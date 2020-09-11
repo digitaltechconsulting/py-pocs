@@ -7,7 +7,7 @@ import datetime
 import os
 import camera.cam as cam
 
-from models import *
+import models.MotionParams as MP
 
 MOTION_SENSOR_PIN = 11
 imageStore = "./snaps"
@@ -42,12 +42,12 @@ class Main:
             if GPIO.input(MOTION_SENSOR_PIN) == GPIO.HIGH:
                 if self.motionDetected == False:
                     #start taking pics
-                    mdp = MotionParams()
+                    mdp = MP.MotionParams()
                     self.motionDetected = True
-                    self.motionDetectedTime = datetime.datetime.now()
+                    #self.motionDetectedTime = datetime.datetime.now()
                     self.logger.LogInfo("Motion has detected and taking snaps");
                 else:
-                    newImageStore = "{imageStore}/{motionDetectedTime}".format(imageStore=imageStore,motionDetectedTime=self.motionDetectedTime)
+                    newImageStore = "{imageStore}/{motionDetectedTime}".format(imageStore=imageStore,motionDetectedTime=mdp.when)
                     if os.path.exists(newImageStore) == False:
                         os.makedirs(newImageStore)
                     fileName = self.cam.captureSingle(path=newImageStore)
