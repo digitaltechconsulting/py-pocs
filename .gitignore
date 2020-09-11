@@ -131,3 +131,5 @@ dmypy.json
 
 #Custom
 snaps/
+camera/*.jpg
+logger/*.jpg
