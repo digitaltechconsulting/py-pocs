@@ -133,3 +133,4 @@ dmypy.json
 snaps/
 camera/*.jpg
 logger/*.jpg
+opencv/*.jpeg
