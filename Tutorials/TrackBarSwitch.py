@@ -5,21 +5,31 @@ class TrackBarSwitchDemo:
     def __init__(self):
         print('Inside constructor')
         self.winname = "MainWindow"
-        cv.namedWindow(self.winname,cv.CV_WINDOW_NORMAL)
-        cv.setWindowProperty(self.winname,cv.WND_PROP_FULLSCREEN,cv.WINDOW_FULLSCREEN)
+
+        #Not working
+        cv.namedWindow(self.winname)
+        #cv.setWindowProperty(self.winname,cv.WND_PROP_FULLSCREEN,cv.WINDOW_FULLSCREEN)
         print('Initializing camera') 
         self.cap = cv.VideoCapture(0)
         print('Initializing camera done') 
-        pass
     def __del__(self):
         print('Inside destructor')
+        self.Dispose()
+    def Dispose(self):
         cv.destroyAllWindows()
         self.cap.release()
-        pass
+
     def Entry(self):
         cv.createTrackbar('test',self.winname,0,255,self.onChange)
+        switch='Gray scaled?'
+        cv.createTrackbar(switch,self.winname,0,1,self.onChange)
         while(1):
             _,frame = self.cap.read()
+            switchValue = cv.getTrackbarPos(switch,self.winname)
+            if switchValue == 1:
+                frame = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
+            else:
+                print('Coloured')
             cv.imshow(self.winname,frame)
             key = cv.waitKey(1)
             if ord('a') == key:
@@ -31,3 +41,4 @@ class TrackBarSwitchDemo:
 if __name__ == "__main__":
     t = TrackBarSwitchDemo()
     t.Entry()
+    t.Dispose()
